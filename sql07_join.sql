@@ -99,11 +99,76 @@ from emp e1, emp e2
 where e1.mgr = e2.empno;
 
 -- 위의 inner join 결과와 left/right/full outer join의 결과를 비교.
+-- left join:
+select e1.empno, e1.ename as "직원이름", e1.mgr, e2.ename as "매니저 이름"
+from emp e1
+    left join emp e2 on e1.mgr = e2.empno;
+    
+-- right join:
+select e1.empno, e1.ename as "직원이름", e1.mgr, e2.ename as "매니저 이름"
+from emp e1
+    right join emp e2 on e1.mgr = e2.empno;
+
+-- full join:
+select e1.empno, e1.ename as "직원이름", e1.mgr, e2.ename as "매니저 이름"
+from emp e1
+    full join emp e2 on e1.mgr = e2.empno;
+
+-- Non-equi join: join의 조건식이 부등식(>, >=, <, <=, ...)이 되는 경우.
+-- 사번, 이름, 급여, 급여등급을 검색.
+select e.empno, e.ename, e.sal, s.grade
+from emp e
+    join salgrade s on e.sal between s.losal and s.hisal;
+
+-- 2) Oracle:
+select e.empno, e.name, e.sal, s.grade
+from emp e, salgrade s
+where e.sal between s.losal and s.hisal;
+
+-- 부서 이름, 부서 위치, 부서의 직원수를 검색(inner join)
+-- 1) ANSI:
+select d.dname, d.loc, count(*)
+from dept d
+    join emp e on d.deptno = e.deptno
+group by d.dname, d.loc;
+
+-- 1) Oracle:
+select d.dname, d.loc, count(*)
+from dept d, emp e
+where d.deptno = e.deptno
+group by d.dname, d.loc;
+
+-- 부서 번호, 부서 이름, 부서의 사원수, 부서의 급여 최솟값, 부서의 급여 최댓값을 검색(inner join)
+select d.deptno, d.dname, count(*), min(e.sal), max(e.sal)
+from dept d
+    join emp e on d.deptno = e.deptno
+group by d.deptno, d.dname;
+
+-- 3개의 테이블을 join
+-- 급여가 3000 이상인 직원 이름, 부서 위치, 급여, 급여 등급을 검색.
+select e.ename, d.loc, e.sal, s.grade 
+from emp e
+    join dept d on e.deptno = d.deptno
+    inner join salgrade s on e.sal between s.losal and s.hisal
+where e.sal >= 3000;
+
+select e.ename, d.loc, e.sal, s.grade 
+from emp e, dept d, salgrade s 
+where e.deptno = d.deptno
+    and e.sal between s.losal and s.hisal
+    and e.sal >= 3000;
 
 
-
-
-
+-- 부서 번호, 부서 이름, 사번, 이름, 매니저 사번, 매니저 이름, 급여, 급여 등급을 검색.
+-- 출력 순서: (1) 부서번호 오름차순, (2) 사번 오름차순
+select d.deptno, d.dname, e1.empno, e1.ename, 
+    e1.mgr, e2.ename as "매니저 이름",
+    e1.sal, s.grade 
+from dept d
+    join emp e1 on d.deptno = e1.deptno
+    join emp e2 on e1.mgr = e2.empno
+    join salgrade s on e1.sal between s.losal and s.hisal
+order by d.deptno, e1.empno;
 
 
 
